@@ -1,5 +1,3 @@
-targetScope = 'subscription'
-
 @minLength(1)
 @maxLength(64)
 @description('Name of the the environment which is used to generate a short unique hash used in all resources.')
@@ -7,7 +5,7 @@ param environmentName string
 
 @minLength(1)
 @description('Primary location for all resources')
-param location string
+param location string = resourceGroup().location
 
 param appName string = ''
 param applicationInsightsDashboardName string = ''
@@ -20,7 +18,6 @@ param mySqlServerAdminPassword string
 param mySqlDatabaseName string = 'petclinic'
 param keyVaultName string = ''
 param logAnalyticsName string = ''
-param resourceGroupName string = ''
 
 @description('Id of the user or app to assign application roles')
 param principalId string = ''
@@ -29,17 +26,9 @@ var abbrs = loadJsonContent('./abbreviations.json')
 var resourceToken = toLower(uniqueString(subscription().id, environmentName, location))
 var tags = { 'azd-env-name': environmentName }
 
-// Organize resources in a resource group
-resource rg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
-  name: !empty(resourceGroupName) ? resourceGroupName : '${abbrs.resourcesResourceGroups}${environmentName}'
-  location: location
-  tags: tags
-}
-
 // Create an App Service Plan to group applications under the same payment plan and SKU
 module appServicePlan './core/host/appserviceplan.bicep' = {
   name: 'appserviceplan'
-  scope: rg
   params: {
     name: !empty(appServicePlanName) ? appServicePlanName : '${abbrs.webServerFarms}${resourceToken}'
     location: location
@@ -53,7 +42,6 @@ module appServicePlan './core/host/appserviceplan.bicep' = {
 // Monitor application with Azure Monitor
 module monitoring './core/monitor/monitoring.bicep' = {
   name: 'monitoring'
-  scope: rg
   params: {
     location: location
     tags: tags
@@ -66,7 +54,6 @@ module monitoring './core/monitor/monitoring.bicep' = {
 // Store secrets in a keyvault
 module keyVault './core/security/keyvault.bicep' = {
   name: 'keyvault'
-  scope: rg
   params: {
     name: !empty(keyVaultName) ? keyVaultName : '${abbrs.keyVaultVaults}${resourceToken}'
     location: location
@@ -78,7 +65,6 @@ module keyVault './core/security/keyvault.bicep' = {
 // The application database
 module mySql './core/database/mysql/mysql-db.bicep' = {
   name: 'mysql-db'
-  scope: rg
   params: {
     location: location
     tags: tags
@@ -93,7 +79,6 @@ module mySql './core/database/mysql/mysql-db.bicep' = {
 // The application backend
 module app './app/app.bicep' = {
   name: 'app'
-  scope: rg
   params: {
     name: !empty(appName) ? appName : '${abbrs.webSitesAppService}petclinic-${resourceToken}'
     location: location
@@ -114,7 +99,6 @@ module app './app/app.bicep' = {
 // Give the API access to KeyVault
 module appKeyVaultAccess './core/security/keyvault-access.bicep' = {
   name: 'app-keyvault-access'
-  scope: rg
   params: {
     keyVaultName: keyVault.outputs.name
     principalId: app.outputs.APP_IDENTITY_PRINCIPAL_ID
