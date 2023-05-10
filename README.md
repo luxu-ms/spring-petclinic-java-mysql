@@ -12,11 +12,11 @@
 ## Quickstart
 1, Clone this repo
 2, Use VS Code to open the cloned folder
-3, Right click the blank space in the VS Code Explorer and select "Deploy to Web App...". (Please install "Azure Tools" if no such option)
-4, Select subscription and the App Service provisioned
+3, Right click the blank space in the VS Code Explorer and select "Deploy to Web App...". (Please install "Azure Tools" extension if no such option)
+4, Select subscription and App Service provisioned
 
 How to Visit:
-Go to the App service overview in Azure Portal, click the Default domain, There will be petlicnic page.
+Go to the App service overview in Azure Portal, click the Default domain, there will be petlicnic page.
 
 ## Run application locally
 

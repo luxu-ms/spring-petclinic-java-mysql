@@ -5,12 +5,13 @@
     "_generator": {
       "name": "bicep",
       "version": "0.16.2.56959",
-      "templateHash": "12618271697559412740"
+      "templateHash": "1154694905938494061"
     }
   },
   "parameters": {
     "environmentName": {
       "type": "string",
+      "defaultValue": "test",
       "metadata": {
         "description": "Name of the the environment which is used to generate a short unique hash used in all resources."
       },
@@ -209,7 +210,7 @@
       "webStaticSites": "stapp-"
     },
     "abbrs": "[variables('$fxv#0')]",
-    "resourceToken": "[toLower(uniqueString(subscription().id, parameters('environmentName'), parameters('location')))]",
+    "resourceToken": "[toLower(uniqueString(resourceGroup().id, parameters('location')))]",
     "tags": {
       "azd-env-name": "[parameters('environmentName')]"
     }

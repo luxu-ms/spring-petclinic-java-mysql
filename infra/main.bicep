@@ -1,7 +1,7 @@
 @minLength(1)
 @maxLength(64)
 @description('Name of the the environment which is used to generate a short unique hash used in all resources.')
-param environmentName string
+param environmentName string = 'test'
 
 @minLength(1)
 @description('Primary location for all resources')
@@ -23,7 +23,7 @@ param logAnalyticsName string = ''
 param principalId string = ''
 
 var abbrs = loadJsonContent('./abbreviations.json')
-var resourceToken = toLower(uniqueString(subscription().id, environmentName, location))
+var resourceToken = toLower(uniqueString(resourceGroup().id, location))
 var tags = { 'azd-env-name': environmentName }
 
 // Create an App Service Plan to group applications under the same payment plan and SKU
